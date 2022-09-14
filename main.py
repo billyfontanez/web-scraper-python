@@ -1,15 +1,37 @@
 import requests
 from bs4 import BeautifulSoup
+from inflection import titleize
 
-r = requests.get('http://www.dailysmarty.com/topics/python')
-# r = requests.get('https://www.bodybuilding.com/fun/articles')
+def titles_generator(links):
+    titles = []
 
-# print(r.text)
+    def post_formatter(url):
+        # if 'posts' in url:
+        if 'content' in url:
+            url = url.split('/')[-1]
+            url = url.replace('-', ' ')
+            url = titleize(url)
+            titles.append(url)
 
+    for link in links:
+        if link.get('href') == None:
+            continue
+        else:
+            post_formatter(link.get("href"))
+
+    return titles
+
+# r = requests.get('http://www.dailysmarty.com/topics/python')
+r = requests.get('https://www.bodybuilding.com/fun/articles')
 soup = BeautifulSoup(r.text, 'html.parser')
-# print(soup)
 links = soup.find_all('a')
-# print(links)
 
-for link in links:
-    print(link['href'])
+titles = titles_generator(links)
+
+for title in titles:
+    print(title)
+
+
+
+
+
